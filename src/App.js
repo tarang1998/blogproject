@@ -1,9 +1,11 @@
 
+import Counter from "./app/features/counter/Counter";
+
 function App() {
   return (
-    <div className="App">
-        Hello
-    </div>
+    <main className="App">
+        <Counter/>
+    </main>
   );
 }
 
