@@ -1,8 +1,33 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { sub } from "date-fns";
 
 const initialState = [
-    { id: '1', title: "Yoo boy is amazing", content: "To amazing" },
-    { id: '2', title: "Spectacular Dacular", content: "Tacular Bachular" }
+    {
+        id: '1',
+        title: "Yoo boy is amazing",
+        content: "To amazing",
+        date: sub(new Date(), { minutes: 10 }).toISOString(),
+        reactions: {
+            thumbsUp: 0,
+            wow: 0,
+            heart: 0,
+            rocket: 0,
+            coffee: 0
+        }
+    },
+    {
+        id: '2',
+        title: "Spectacular Dacular",
+        content: "Tacular Bachular",
+        date: sub(new Date(), { minutes: 5 }).toISOString(),
+        reactions: {
+            thumbsUp: 0,
+            wow: 0,
+            heart: 0,
+            rocket: 0,
+            coffee: 0
+        }
+    }
 ]
 
 const postsSlice = createSlice({
@@ -13,14 +38,30 @@ const postsSlice = createSlice({
             reducer(state, action) {
                 state.push(action.payload)
             },
-            prepare(title, content) {
+            prepare(title, content, userId) {
                 return {
                     payload: {
                         id: nanoid,
                         title: title,
-                        content: content
+                        content: content,
+                        date: new Date().toISOString(),
+                        userId: userId,
+                        reactions: {
+                            thumbsUp: 0,
+                            wow: 0,
+                            heart: 0,
+                            rocket: 0,
+                            coffee: 0
+                        }
                     }
                 }
+            }
+        },
+        reactionAdded(state, action) {
+            const { postId, reaction } = action.payload
+            const existingPost = state.find(post => post.id === postId)
+            if (existingPost) {
+                existingPost.reactions[reaction]++
             }
         }
     }
@@ -28,7 +69,7 @@ const postsSlice = createSlice({
 
 export const selectAllPosts = (state) => state.posts;
 
-export const { postAdded } = postsSlice.actions;
+export const { postAdded, reactionAdded } = postsSlice.actions;
 
 
 export default postsSlice.reducer
