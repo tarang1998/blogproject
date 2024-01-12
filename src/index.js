@@ -7,6 +7,9 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 // import "./counter.css"
 import "./posts.css"
+import { fetchUsers } from './app/features/users/userSlice'; 
+
+store.dispatch(fetchUsers());
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
