@@ -10,8 +10,8 @@ function App() {
   return (
     <main className="App">
       {/* <Counter/> */}
-      <PostsList />
       <AddPostForm />
+      <PostsList />
 
     </main>
   );
