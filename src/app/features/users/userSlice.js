@@ -18,7 +18,6 @@ export const fetchUsers = createAsyncThunk('posts/fetchUsers', async () => {
 
 })
 
-
 const usersSlice = createSlice({
     name: 'users',
     initialState,

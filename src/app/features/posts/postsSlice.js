@@ -19,6 +19,7 @@ const initialState = {
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
     //TODO : Check If already fetching data 
     try {
+        console.log('Fetching posts')
         const response = await axios.get(POSTS_URL)
         return [...response.data]
     }
@@ -26,9 +27,12 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
         return err.message;
     }
 
+})
 
-
-
+export const addNewPost = createAsyncThunk('posts/addNewPost', async (initialPost) => {
+    const response = await axios.post(POSTS_URL, initialPost)
+    console.log(response)
+    return response.data
 })
 
 const postsSlice = createSlice({
@@ -84,18 +88,18 @@ const postsSlice = createSlice({
                 }
                 else {
                     let payload = action.payload ?? []
-                    const loadedPosts = payload.filter(post => !state.postIds.includes(post.id)).map(post => {
-                            state.postIds.push(post.id)
-                            post.date = sub(new Date(), { minutes: min++ }).toISOString();
-                            post.reactions = {
-                                thumbsUp: 0,
-                                wow: 0,
-                                heart: 0,
-                                rocket: 0,
-                                coffee: 0
-                            }
-                            return post;
-                      
+                    const loadedPosts = payload.filter(post => !state.postIds.includes(post.id))    .map(post => {
+                        state.postIds.push(post.id)
+                        post.date = sub(new Date(), { minutes: min++ }).toISOString();
+                        post.reactions = {
+                            thumbsUp: 0,
+                            wow: 0,
+                            heart: 0,
+                            rocket: 0,
+                            coffee: 0
+                        }
+                        return post;
+
                     });
 
                     // Add any fetched posts to the array
@@ -107,31 +111,31 @@ const postsSlice = createSlice({
                 state.status = 'failed'
                 state.error = action.error.message
             })
-        // .addCase(addNewPost.fulfilled, (state, action) => {
-        //     // Fix for API post IDs:
-        //     // Creating sortedPosts & assigning the id 
-        //     // would be not be needed if the fake API 
-        //     // returned accurate new post IDs
-        //     const sortedPosts = state.posts.sort((a, b) => {
-        //         if (a.id > b.id) return 1
-        //         if (a.id < b.id) return -1
-        //         return 0
-        //     })
-        //     action.payload.id = sortedPosts[sortedPosts.length - 1].id + 1;
-        //     // End fix for fake API post IDs 
+            .addCase(addNewPost.fulfilled, (state, action) => {
+                // Fix for API post IDs:
+                // Creating sortedPosts & assigning the id 
+                // would be not be needed if the fake API 
+                // returned accurate new post IDs
+                const sortedPosts = state.posts.sort((a, b) => {
+                    if (a.id > b.id) return 1
+                    if (a.id < b.id) return -1
+                    return 0
+                })
+                action.payload.id = sortedPosts[sortedPosts.length - 1].id + 1;
+                // End fix for fake API post IDs 
 
-        //     action.payload.userId = Number(action.payload.userId)
-        //     action.payload.date = new Date().toISOString();
-        //     action.payload.reactions = {
-        //         thumbsUp: 0,
-        //         hooray: 0,
-        //         heart: 0,
-        //         rocket: 0,
-        //         eyes: 0
-        //     }
-        //     console.log(action.payload)
-        //     state.posts.push(action.payload)
-        // })
+                action.payload.userId = Number(action.payload.userId)
+                action.payload.date = new Date().toISOString();
+                action.payload.reactions = {
+                    thumbsUp: 0,
+                    wow: 0,
+                    heart: 0,
+                    rocket: 0,
+                    coffee: 0
+                }
+                state.posts.push(action.payload)
+                state.postIds.push(action.payload.id)
+            })
     }
 })
 
